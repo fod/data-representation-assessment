@@ -1,0 +1,16 @@
+User Registration login and authentication
+User enters food item and quantity
+New food is added to food_items table
+food item is added to food log for User
+
+Can:
+- View all food logs
+- View all food items
+- Add new food item
+- Add new food log
+- Delete food item
+- Delete food log
+- Edit food item
+- Edit food log
+- View food log by date
+- view nutrition report by date
