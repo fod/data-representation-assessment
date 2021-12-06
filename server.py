@@ -42,7 +42,17 @@ def addFood():
 
 @app.route('/food/<int:food_id>', methods=['PUT'])
 def updateFood(food_id):
-    pass
+    food_item = foodDAO.getOne(food_id)
+    if 'name' in request.json:
+        food_item['name'] = request.json.get('name', food_item['name'])
+    food['calories'] = request.json.get('calories', food['calories'])
+    food['fat'] = request.json.get('fat', food['fat'])
+    food['carbs'] = request.json.get('carbs', food['carbs'])
+    food['protein'] = request.json.get('protein', food['protein'])
+    
+    return jsonify(foodDAO.update(food))
+
+
 
 @app.route('/food/<int:food_id>', methods=['DELETE'])
 def deleteFood(food_id):
