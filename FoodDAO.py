@@ -4,14 +4,16 @@
 
 import mysql.connector
 
+from settings import MYSQL_DB, MYSQL_HOST, MYSQL_PASSWORD, MYSQL_USER
+
 class FoodDAO:
     db=""
     def __init__(self):
         self.db = mysql.connector.connect(
-        host="localhost",
-        user="fod",
-        password="Mfthotd",
-        database="food"
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DB
         )
 
     def create(self, values):

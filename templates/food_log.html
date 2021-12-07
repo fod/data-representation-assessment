@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Food Log - {{session.username}}{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+{% block nav %}
+<a class="nav-link active" aria-current="page" href="food_log">Food log</a>
+<a class="nav-link" href="update_food">Update foods</a>
+<a class="nav-link" href="logout">Logout {{session.username}}</a>
+{% endblock %}
+{% set bgcol = 'bg-light' %}
+{% block content %}
+<table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Food</th>
+        <th>Quantity</th>
+        <th>Protein</th>
+        <th>Carbs</th>
+        <th>Fat</th>
+        <th>Calories</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.name }}</td>
+          <td>{{ user.age }}</td>
+          <td>{{ user.address }}</td>
+          <td>{{ user.phone }}</td>
+          <td>{{ user.email }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+{% block footer %}
+
+{% endblock %}
+
+
+
