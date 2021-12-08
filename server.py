@@ -23,7 +23,6 @@ if __name__== '__main__':
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
     msg = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
@@ -35,7 +34,8 @@ def login():
             session['id'] = account['id']
             session['username'] = account['username']
             msg = 'Logged in successfully !'
-            return render_template('food_log.html', msg = msg)
+            food_log = getFoodLog(session['username'])
+            return render_template('food_log.html', msg = msg, food_log=food_log)
         else:
             msg = 'Incorrect username / password'
     return render_template('login.html', msg = msg)
@@ -124,5 +124,8 @@ def deleteFood(food_id):
         return jsonify({'result': False})
 
 
+def getFoodLog(username):
+    userid = usersDAO.get_user(username)['id']
+    return usersDAO.get_food_log(userid)
 
     

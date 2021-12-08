@@ -22,12 +22,12 @@ CREATE TABLE food_items (
 CREATE TABLE food_log (
   id INT NOT NULL AUTO_INCREMENT,
   food_id INT NOT NULL,
-  userid INT NOT NULL,
+  user_id INT NOT NULL,
   date DATE NOT NULL,
   quantity INT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (food_id) REFERENCES food_items(id),
-  FOREIGN KEY (userid) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 

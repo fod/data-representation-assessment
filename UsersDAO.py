@@ -32,6 +32,26 @@ class UsersDAO:
         self.db.commit()
         return cursor.lastrowid
 
+    def get_food_log(self, user_id):
+        cursor = self.db.cursor(dictionary=True)
+        cursor.execute(log_query, (user_id,))
+        return cursor.fetchall()
 
-
+log_query = """
+SELECT
+    a.date,
+    b.name,
+    a.quantity,
+    round((b.calories * (a.quantity / 100)), 0) calories,
+    round((b.protein * (a.quantity / 100)), 0) protein,
+    round((b.carbs * (a.quantity / 100)), 0) carbs,
+    round((b.fat * (a.quantity / 100)), 0) fat
+FROM
+    food_log a
+    JOIN food_items b ON a.food_id = b.id
+WHERE
+    a.user_id = %s
+ORDER BY
+    a.date DESC;
+"""
 

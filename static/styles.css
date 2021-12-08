@@ -37,7 +37,7 @@ body {
 }
 
 .cover-container {
-  max-width: 42em;
+  max-width: 50em;
 }
 
 
@@ -71,7 +71,18 @@ body {
   border-bottom-color: #fff;
 }
 
+.page-item.active .page-link {
+  background-color: lightgrey !important;
+  border: 1px solid black;
+}
+.page-link {
+  color: black !important;
+}
 
+.dataTables_info {
+  color: black !important;
+
+}
 
 
 /* 
