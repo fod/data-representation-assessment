@@ -4,9 +4,11 @@
 
 from flask import Flask, url_for, request, redirect, abort, jsonify, render_template, session
 import re
+import requests
 from FoodDAO import FoodDAO
 from UsersDAO import UsersDAO
-from settings import SECRET_KEY
+from settings import EDAMAM_PARSER_BASE_URL, SECRET_KEY, EDAMAM_AUTOCOMPLETE_BASE_URL, EDAMAM_APP_ID, EDAMAM_API_KEY
+
 
 foodDAO = FoodDAO()
 usersDAO = UsersDAO()
@@ -27,7 +29,6 @@ def login():
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
-        print("in POST")
         account = usersDAO.get_user(username, password)
         if account:
             session['loggedin'] = True
@@ -70,11 +71,66 @@ def register():
             usersDAO.create_user(username, password, email)
             msg = 'You have successfully registered'
     elif request.method == 'POST':
-        msg = 'Enter details'
+        msg = 'Please enter all details'
     return render_template('register.html', msg = msg)
 
 
 ###### END LOGIN AND REGISTRATION ######
+
+### AUTOCOMPLETE ###
+
+@app.route('/autocomplete_log/food', methods=['GET', 'POST'])
+def autocomplete_log():
+    query = request.args.get('query')
+    results = foodDAO.autocomplete(query)
+    return jsonify(results)
+
+@app.route('/autocomplete_add/food', methods=['GET', 'POST'])
+def autocomplete_add():
+    query = request.args.get('query')
+    api_url = EDAMAM_AUTOCOMPLETE_BASE_URL + '?app_id=' + EDAMAM_APP_ID + '&app_key=' + EDAMAM_API_KEY + '&q=' + query + '&limit=20'
+    results = requests.get(api_url).json()
+    returnDict = {'query': query, 'suggestions': results}
+    return returnDict
+
+@app.route('/autocomplete_add_details/', methods=['GET', 'POST'])
+def autocomplete_add_details():
+    query = request.args.get('query')
+    api_url = EDAMAM_PARSER_BASE_URL + '?app_id=' + EDAMAM_APP_ID + '&app_key=' + EDAMAM_API_KEY + '&ingr=' + query + '&nutrition-type=logging'
+    results = requests.get(api_url).json()
+    details = results['parsed'][0]['food']
+    returnDict = {'name':    details['label'] if 'label' in details else query, 
+                  'calories': round(details['nutrients']['ENERC_KCAL']) if 'ENERC_KCAL' in details['nutrients'] else 0,
+                  'protein':  round(details['nutrients']['PROCNT'], 2) if 'PROCNT' in details['nutrients'] else 0,
+                  'fat':      round(details['nutrients']['FAT'], 2) if 'FAT' in details['nutrients'] else 0,
+                  'carbs':    round(details['nutrients']['CHOCDF'], 2) if 'CHOCDF' in details['nutrients'] else 0}
+    print(returnDict)
+    return returnDict
+#{'text': 'dried dill weed', 'parsed': [{'food': {'foodId': 'food_agbfjqyaamtjoca777fmtarkdh6u', 'label': 'Dried Dill Weed', 'nutrients': {'ENERC_KCAL': 253.0, 'PROCNT': 19.96, 'FAT': 4.36, 'CHOCDF': 55.82, 'FIBTG': 13.6}, 'category': 'Generic foods', 'categoryLabel': 'food', 'image': 'https://www.edamam.com/food-img/927/927173abe613e0c9124c406d236e81bd.jpg'}, 'quantity': 1.0, 'measure': {'uri': 'http://www.edamam.com/ontologies/edamam.owl#Measure_serving', 'label': 'Serving', 'weight': 1.0}}], 'hints': [{'food': {'foodId': 'food_agbfjqyaamtjoca777fmtarkdh6u', 'label': 'Dried Dill Weed', 'nutrients': {'ENERC_KCAL': 253.0, 'PROCNT': 19.96, 'FAT': 4.36, 'CHOCDF': 55.82, 'FIBTG': 13.6}, 'category': 'Generic foods', 'categoryLabel': 'food', 'image': 'https://www.edamam.com/food-img/927/927173abe613e0c9124c406d236e81bd.jpg'}, 'measures': [{'uri': 'http://www.edamam.com/ontologies/edamam.owl#Measure_serving', 'label': 'Serving', 'weight': 1.0}, {'uri': 'http://www.edamam.com/ontologies/edamam.owl#Measure_gram', 'label': 'Gram', 'weight': 1.0}, {'uri': 'http://www.edamam.com/ontologies/edamam.ow
+
+### END AUTOCOMPLETE ###
+
+### LOG FOOD ###
+
+@app.route('/log_food', methods=['POST'])
+def log_food():
+    msg = ''
+    user_id = usersDAO.get_user(session['username'])['id']
+    if all (k in request.form for k in ('food', 'quantity', 'date')):
+        food = request.form['food']
+        quantity = request.form['quantity']
+        date = request.form['date']
+        food_id = foodDAO.getByName(request.form['food'])
+        if food_id:
+            quantity = request.form['quantity']
+            date = request.form['date'] 
+            usersDAO.log_food(user_id, food_id, quantity, date)
+        else:
+            msg = 'Food does not exist. Please create it first'
+    else:
+        msg = 'Please complete all fields.'
+
+    return render_template('food_log.html' , msg = msg, food_log = usersDAO.get_food_log(user_id))
 
 @app.route('/foods')
 def getAllFoods():
@@ -84,19 +140,19 @@ def getAllFoods():
 def getFood(id):
     return jsonify(foodDAO.getOne(id))
 
-@app.route('/food', methods=['POST'])
-def addFood():
-    if not request.json or not 'name' in request.json:
-        abort(400)
-    food = {
-        'name': request.json['name'],
-        'calories': request.json['calories'],
-        'fat': request.json['fat'],
-        'carbs': request.json['carbs'],
-        'protein': request.json['protein']
-    }
-    print(food)
-    return jsonify(foodDAO.create(food))
+@app.route('/add_food', methods=['POST'])
+def add_food():
+    food = (
+        request.form['food'],
+        request.form['calories'],
+        request.form['protein'],
+        request.form['carbs'],
+        request.form['fat']
+    )
+    foodDAO.add(food)
+    msg = f"request.form['food'] added"
+    user_id = usersDAO.get_user(session['username'])['id']
+    return render_template('food_log.html' , msg = msg, food_log = usersDAO.get_food_log(user_id))
     
 
 @app.route('/food/<int:food_id>', methods=['PUT'])

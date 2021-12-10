@@ -3,8 +3,9 @@
 # Author: Fiachra O' Donoghue
 
 EDAMAM_AUTOCOMPLETE_BASE_URL =  "https://api.edamam.com/auto-complete"
+EDAMAM_PARSER_BASE_URL = "https://api.edamam.com/api/food-database/v2/parser"
 EDAMAM_APP_ID = "92a29ddd"
-EDAMAM_API_KEY = "ff509ac75eec78e04abeb6b7cae56232"
+EDAMAM_API_KEY = "ab9a9826920b940a96b99b17d7bed839"
 
 MYSQL_HOST = "localhost"
 MYSQL_USER = "fod"

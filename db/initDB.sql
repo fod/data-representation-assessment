@@ -13,9 +13,9 @@ CREATE TABLE food_items (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   calories INT NOT NULL,
-  protein INT NOT NULL,
-  carbs INT NOT NULL,
-  fat INT NOT NULL,
+  protein FLOAT NOT NULL,
+  carbs FLOAT NOT NULL,
+  fat FLOAT NOT NULL,
   PRIMARY KEY (id)
 );
 

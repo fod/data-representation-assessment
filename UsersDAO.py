@@ -3,39 +3,60 @@ import mysql.connector
 from settings import MYSQL_DB, MYSQL_HOST, MYSQL_PASSWORD, MYSQL_USER
 
 class UsersDAO:
-
     db=""
-    def __init__(self):
+    def connect_to_db(self):
         self.db = mysql.connector.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DB
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DB
         )
 
+    def __init__(self):
+        self.connect_to_db()
+
+    def get_cursor(self, **kwargs):
+        if not self.db.is_connected():
+            self.connect_to_db()
+        return self.db.cursor(**kwargs)
+
     def get_user(self, username, password=None):
-        cursor = self.db.cursor(dictionary=True, buffered=True)
+        # buffered = True to prevent 'Unread result found' error
+        cursor = self.get_cursor(dictionary=True, buffered=True)
         if password is None:
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
         else:
             cursor.execute('SELECT * FROM users WHERE username = %s AND password = %s', (username, password, ))
-        return cursor.fetchone()
+        result = cursor.fetchone()
+        cursor.close()
+        return result
 
     def get_user_by_email(self, email):
-        cursor = self.db.cursor(dictionary=True)
+        cursor = self.get_cursor(dictionary=True)
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-        return cursor.fetchone()
+        result = cursor.fetchone()
+        cursor.close()
+        return result
 
     def create_user(self, username, password, email):
-        cursor = self.db.cursor()
+        cursor = self.get_cursor()
         cursor.execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", (username, password, email))
         self.db.commit()
-        return cursor.lastrowid
+        cursor.close()
 
     def get_food_log(self, user_id):
-        cursor = self.db.cursor(dictionary=True)
+        cursor = self.get_cursor(dictionary=True)
         cursor.execute(log_query, (user_id,))
-        return cursor.fetchall()
+        result = cursor.fetchall()
+        cursor.close()
+        return result
+
+    def log_food(self, user_id, food_id, quantity, date):
+        cursor = self.get_cursor()
+        cursor.execute("INSERT INTO food_log (user_id, food_id, quantity, date) VALUES (%s, %s, %s, %s)", (user_id, food_id, quantity, date))
+        self.db.commit()
+        cursor.close()
+
 
 log_query = """
 SELECT

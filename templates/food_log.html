@@ -1,55 +1,191 @@
 {% extends "base.html" %}
 {% block title %}Food Log - {{session.username}}{% endblock %}
 {% block head %}
-  {{ super() }}
+{{ super() }}
 {% endblock %}
 
 {% block nav %}
-<a class="nav-link active" aria-current="page" href="food_log">Food log</a>
-<a class="nav-link" href="update_food">Update foods</a>
-<a class="nav-link" href="logout">Logout {{session.username}}</a>
+
+<a class="nav-link active" aria-current="page" href="#" data-toggle="tooltip" title="View your food logs">View</a>
+<a class="nav-link" href="#" data-toggle="tooltip" title="Log something you've eaten" data-bs-toggle="modal" data-bs-target="#log_food_modal">Log</a>
+<a class="nav-link" href="#" data-toggle="tooltip" title="Edit an existing log entry">Edit</a>
+<a class="nav-link" href="#" data-toggle="tooltip" title="Add a new food type to the database" data-bs-toggle="modal" data-bs-target="#add_food_modal">Add food</a>
+<a class="nav-link" href="logout" data-toggle="tooltip" title="Log out of the application">Logout {{session.username}}</a>
+
 {% endblock %}
 {% set bgcol = 'bg-light bg-opacity-90 border border-white' %}
 {% block content %}
-<table id="data" class="table table-striped small" style="text-shadow:none">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Food</th>
-        <th>Quantity</th>
-        <th>Protein</th>
-        <th>Carbs</th>
-        <th>Fat</th>
-        <th>Calories</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for log in food_log %}
-        <tr>
-          <td>{{ log.date }}</td>
-          <td>{{ log.name }}</td>
-          <td>{{ log.quantity }}</td>
-          <td>{{ log.protein }}</td>
-          <td>{{ log.carbs }}</td>
-          <td>{{ log.fat }}</td>
-          <td>{{ log.calories }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
 
+    <!-- log food modal -->
+    <div class="modal fade" id="log_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="log_food_label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="log_food_label">Log a food item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{{ url_for('log_food') }}" method="post">
+              <div class="form-group wide mb-3">
+              
+                  <label for="food">Food</label>
+                  <input type="text" required class="form-control" name="food" id="autocomplete_log" aria-describedby="foodHelp" placeholder="Enter food name">
+                  
+                    <button class="btn btn-outline-secondary" type="button">Add new food to database</button>
+                  
+                </div>
+              
+              <div class="form-group wide mb-3">
+                <label for="date">Date</label>
+                <input type="date" required class="form-control" name="date" id="date" aria-describedby="dateHelp" placeholder="Select date">
+              </div>
+              <div class="form-group wide mb-3">
+                <label for="quantity">Quantity (g)</label>
+                <input type="number" required class="form-control" name="quantity" id="quantity" placeholder="Quantity (g)">
+              </div>
+
+              <div class="form-group wide mb-3">
+                  <button type="submit" class="btn btn-secondary">Submit</button>
+                  <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+              
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- add food modal -->
+        <div class="modal fade" id="add_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="add_food_label" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="add_food_label">Add a food type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="{{ url_for('add_food') }}" method="post">
+                  <div class="form-group wide mb-3">
+                      <label for="food">Food</label>
+                      <input type="text" required class="form-control" name="food" id="autocomplete_add" aria-describedby="foodHelp" placeholder="Enter food name">
+                    </div>
+                  <div class="form-group wide mb-3">
+                    <label for="calories">Calories / 100g</label>
+                    <input type="number" required class="form-control" name="calories" id="calories" aria-describedby="caloriesHelp" placeholder="Calories per 100g">
+                  </div>
+                  <div class="form-group wide mb-3">
+                    <label for="protein">Protein %</label>
+                    <input type="number" step="0.01" required class="form-control" name="protein" id="protein" aria-describedby="proteinHelp" placeholder="Protein (g per 100g)">
+                  </div>
+                  <div class="form-group wide mb-3">
+                    <label for="carbs">Carbohydrate %</label>
+                    <input type="number" step="0.01" required class="form-control" name="carbs" id="carbs" aria-describedby="carbsHelp" placeholder="Carbohydrate (g per 100g)">
+                  </div>
+                  <div class="form-group wide mb-3">
+                    <label for="fat">Fat %</label>
+                    <input type="number" step="0.01" required class="form-control" name="fat" id="fat" aria-describedby="fatHelp" placeholder="Fat (g per 100g)">
+                  </div>
+    
+                  <div class="form-group wide mb-3">
+                      <button type="submit" class="btn btn-secondary">Submit</button>
+                      <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                  
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<table id="data" class="table table-striped small rounded" style="text-shadow:none">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Food</th>
+      <th>Quantity (g)</th>
+      <th>Protein</th>
+      <th>Carbs</th>
+      <th>Fat</th>
+      <th>Calories</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in food_log %}
+    <tr>
+      <td>{{ log.date }}</td>
+      <td>{{ log.name }}</td>
+      <td>{{ log.quantity }}</td>
+      <td>{{ log.protein }}</td>
+      <td>{{ log.carbs }}</td>
+      <td>{{ log.fat }}</td>
+      <td>{{ log.calories }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
+
 {% block footer %}
 
 {% endblock %}
 
 {% block scripts %}
-  {{ super() }}
-  <script>
-    $(document).ready(function () {
-      $('#data').DataTable({"searching": false, "lengthChange": false});
+{{ super() }}
+<script src="{{ url_for('static', filename='jquery.autocomplete.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $('#data').DataTable({
+      'searching': false,
+      'lengthChange': false,
+      'select': true,
+      'order': [[0, 'desc']]
     });
-  </script>
-{% endblock %}
 
+    $('[data-toggle="tooltip"]').tooltip({'placement':'bottom', 'trigger': 'hover'});
+
+    $('.nav-link').on('click', function(event) {
+      $('.nav-link.active').removeClass('active');
+      $(this).addClass('active');
+    });
+
+    $('#autocomplete_log').autocomplete({
+      serviceUrl: '/autocomplete_log/food',
+      onSearchComplete: function (query, suggestions) {
+        if(!suggestions.length){
+          $('#add_food_modal').modal('show');
+
+        }
+      },
+      onSelect: function (suggestion) {
+        
+    }
+  });
+
+    $('#autocomplete_add').autocomplete({
+      serviceUrl: '/autocomplete_add/food',
+      onSelect: function (suggestion) {
+        $.ajax({
+          url: '/autocomplete_add_details',
+          type: 'GET',
+          "dataType": "JSON",
+          data: {'query': encodeURIComponent(suggestion.value)},
+          success: function(data) {
+            $('#autocomplete_add').val(data.name);
+            $('#calories').val(data.calories);
+            $('#protein').val(data.protein);
+            $('#carbs').val(data.carbs);
+            $('#fat').val(data.fat);
+          }
+        });
+    }
+  });
+
+
+ 
+});
+
+
+
+</script>
+{% endblock %}
 
