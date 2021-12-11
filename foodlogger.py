@@ -1,4 +1,4 @@
-# server.py
+# foodlogger.py
 # Flask server
 # Author: Fiachra O' Donoghue
 
@@ -104,7 +104,6 @@ def autocomplete_add_details():
                   'protein':  round(details['nutrients']['PROCNT'], 2) if 'PROCNT' in details['nutrients'] else 0,
                   'fat':      round(details['nutrients']['FAT'], 2) if 'FAT' in details['nutrients'] else 0,
                   'carbs':    round(details['nutrients']['CHOCDF'], 2) if 'CHOCDF' in details['nutrients'] else 0}
-    print(returnDict)
     return returnDict
 #{'text': 'dried dill weed', 'parsed': [{'food': {'foodId': 'food_agbfjqyaamtjoca777fmtarkdh6u', 'label': 'Dried Dill Weed', 'nutrients': {'ENERC_KCAL': 253.0, 'PROCNT': 19.96, 'FAT': 4.36, 'CHOCDF': 55.82, 'FIBTG': 13.6}, 'category': 'Generic foods', 'categoryLabel': 'food', 'image': 'https://www.edamam.com/food-img/927/927173abe613e0c9124c406d236e81bd.jpg'}, 'quantity': 1.0, 'measure': {'uri': 'http://www.edamam.com/ontologies/edamam.owl#Measure_serving', 'label': 'Serving', 'weight': 1.0}}], 'hints': [{'food': {'foodId': 'food_agbfjqyaamtjoca777fmtarkdh6u', 'label': 'Dried Dill Weed', 'nutrients': {'ENERC_KCAL': 253.0, 'PROCNT': 19.96, 'FAT': 4.36, 'CHOCDF': 55.82, 'FIBTG': 13.6}, 'category': 'Generic foods', 'categoryLabel': 'food', 'image': 'https://www.edamam.com/food-img/927/927173abe613e0c9124c406d236e81bd.jpg'}, 'measures': [{'uri': 'http://www.edamam.com/ontologies/edamam.owl#Measure_serving', 'label': 'Serving', 'weight': 1.0}, {'uri': 'http://www.edamam.com/ontologies/edamam.owl#Measure_gram', 'label': 'Gram', 'weight': 1.0}, {'uri': 'http://www.edamam.com/ontologies/edamam.ow
 
