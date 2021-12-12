@@ -93,7 +93,10 @@ class FoodDAO:
         cursor.execute(sql, values)
         result = cursor.fetchall()
         cursor.close()
-        return result[0][0]
+        if result:
+            return result[0][0]
+        else:
+            return None
 
     def exists(self, name):
         cursor = self.get_cursor()

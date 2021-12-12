@@ -44,6 +44,13 @@ class UsersDAO:
         self.db.commit()
         cursor.close()
 
+    def get_entry_by_id(self, log_id):
+        cursor = self.get_cursor(dictionary=True)
+        cursor.execute(log_entry_query, (log_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        return result
+
     def get_food_log(self, user_id):
         cursor = self.get_cursor(dictionary=True)
         cursor.execute(log_query, (user_id,))
@@ -57,9 +64,32 @@ class UsersDAO:
         self.db.commit()
         cursor.close()
 
+    def update_food_log(self, log_id, food_id, user_id, date, quantity):
+        cursor = self.get_cursor()
+        cursor.execute("UPDATE food_log SET food_id = %s, user_id = %s, date = %s, quantity = %s WHERE id = %s", (food_id, user_id, date, quantity, log_id))
+        self.db.commit()
+        cursor.close()
+
+
+log_entry_query = """
+SELECT
+    a.name,
+    b.id,
+    b.user_id,
+    b.date,
+    b.quantity
+FROM
+    food_items a
+    JOIN food_log b ON a.id = b.food_id
+WHERE
+    b.id = %s
+"""
+
+
 
 log_query = """
 SELECT
+    a.id,
     a.date,
     b.name,
     a.quantity,

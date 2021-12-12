@@ -113,7 +113,7 @@ def autocomplete_add_details():
 
 @app.route('/log_food', methods=['POST'])
 def log_food():
-    msg = ''
+    bad_log_msg = ''
     user_id = usersDAO.get_user(session['username'])['id']
     if all (k in request.form for k in ('food', 'quantity', 'date')):
         food = request.form['food']
@@ -125,11 +125,11 @@ def log_food():
             date = request.form['date'] 
             usersDAO.log_food(user_id, food_id, quantity, date)
         else:
-            msg = 'Food does not exist. Please create it first'
+            bad_log_msg = 'Food does not exist. Please create it first'
     else:
-        msg = 'Please complete all fields.'
+        bad_log_msg = 'Please complete all fields.'
 
-    return render_template('food_log.html' , msg = msg, food_log = usersDAO.get_food_log(user_id))
+    return render_template('food_log.html' , bad_log_msg = bad_log_msg, food_log = usersDAO.get_food_log(user_id))
 
 @app.route('/foods')
 def getAllFoods():
@@ -141,6 +141,7 @@ def getFood(id):
 
 @app.route('/add_food', methods=['POST'])
 def add_food():
+
     food = (
         request.form['food'],
         request.form['calories'],
@@ -150,8 +151,9 @@ def add_food():
     )
     foodDAO.add(food)
     msg = f"request.form['food'] added"
+    food_name = request.form['food']
     user_id = usersDAO.get_user(session['username'])['id']
-    return render_template('food_log.html' , msg = msg, food_log = usersDAO.get_food_log(user_id))
+    return render_template('food_log.html' , msg = msg, food_log = usersDAO.get_food_log(user_id), food_name = food_name)
     
 
 @app.route('/food/<int:food_id>', methods=['PUT'])
@@ -178,6 +180,19 @@ def deleteFood(food_id):
     else:
         return jsonify({'result': False})
 
+
+
+@app.route('/log/<int:log_id>', methods=['GET', 'PUT', 'DELETE'])
+def log(log_id):
+    if request.method == 'GET':
+        return jsonify(usersDAO.get_entry_by_id(log_id))
+    elif request.method == 'PUT':
+        food_id = foodDAO.getByName(request.form['food'])
+        quantity = request.form['quantity']
+        date = request.form['date']
+        user_id = usersDAO.get_user(session['username'])['id']
+        usersDAO.update_log(log_id, food_id, user_id, date, quantity)
+    return render_template('food_log.html' , msg = 'Entry updated')
 
 def getFoodLog(username):
     userid = usersDAO.get_user(username)['id']
