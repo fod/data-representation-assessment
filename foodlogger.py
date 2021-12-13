@@ -34,7 +34,7 @@ def login():
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = account['username']
-            msg = 'Logged in successfully !'
+            msg = 'Logged in successfully!'
             food_log = getFoodLog(session['username'])
             return render_template('food_log.html', msg = msg, food_log=food_log)
         else:
@@ -129,7 +129,14 @@ def log_food():
     else:
         bad_log_msg = 'Please complete all fields.'
 
-    return render_template('food_log.html' , bad_log_msg = bad_log_msg, food_log = usersDAO.get_food_log(user_id))
+    return redirect(url_for('success'))
+    # render_template('food_log.html' , bad_log_msg = bad_log_msg, food_log = usersDAO.get_food_log(user_id))
+    
+@app.route('/success', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def success():
+    user_id = usersDAO.get_user(session['username'])['id']
+    redirect(url_for('log_food'))
+    return render_template('food_log.html', food_log = usersDAO.get_food_log(user_id))
 
 @app.route('/foods')
 def getAllFoods():
@@ -187,12 +194,19 @@ def log(log_id):
     if request.method == 'GET':
         return jsonify(usersDAO.get_entry_by_id(log_id))
     elif request.method == 'PUT':
+        print(request.form)
         food_id = foodDAO.getByName(request.form['food'])
         quantity = request.form['quantity']
         date = request.form['date']
         user_id = usersDAO.get_user(session['username'])['id']
-        usersDAO.update_log(log_id, food_id, user_id, date, quantity)
-    return render_template('food_log.html' , msg = 'Entry updated')
+        usersDAO.update_food_log(log_id, food_id, user_id, date, quantity)
+        # return render_template('food_log.html' , msg = 'Entry updated', food_log = usersDAO.get_food_log(user_id))
+        return redirect(url_for('success'))
+    elif request.method == 'DELETE':
+        usersDAO.delete_food_log(log_id)
+        user_id = usersDAO.get_user(session['username'])['id']
+        return redirect(url_for('success'))
+        #return render_template('food_log.html' , msg = 'Entry deleted', food_log = usersDAO.get_food_log(user_id))
 
 def getFoodLog(username):
     userid = usersDAO.get_user(username)['id']

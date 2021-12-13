@@ -70,13 +70,20 @@ class UsersDAO:
         self.db.commit()
         cursor.close()
 
+    def delete_food_log(self, log_id):
+        cursor = self.get_cursor()
+        cursor.execute("DELETE FROM food_log WHERE id = %s", (log_id,))
+        self.db.commit()
+        cursor.close()
+
 
 log_entry_query = """
 SELECT
     a.name,
     b.id,
+    b.food_id,
     b.user_id,
-    b.date,
+    DATE_FORMAT(b.date, '%Y-%m-%d') as date,
     b.quantity
 FROM
     food_items a
@@ -84,8 +91,6 @@ FROM
 WHERE
     b.id = %s
 """
-
-
 
 log_query = """
 SELECT

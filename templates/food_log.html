@@ -182,7 +182,7 @@ $(document).on('click', "#button2", function() {
     });
 
     $('#edit_log').on('click', function(event) {
-      console.log('edit log');
+      msg = ''
       $('#select_row_msg').text('Select a row to edit');
       table = $('#data').DataTable();
       table.on( 'select', function ( e, dt, type, indexes ) {       
@@ -196,8 +196,38 @@ $(document).on('click', "#button2", function() {
             $('#autocomplete_log').val(data.name);
             $('#date').val(data.date);
             $('#quantity').val(data.quantity);
-            $('#log_form').attr('action', '/log/' + log_id).attr('method', 'PUT');
+            $('#food_id_log').val(data.food_id);
+            //$('#log_form').removeAttr('action');//(, '/log/' + log_id).attr('method', 'PUT');
+            $('#log_form').on('submit', function(event) {
+              event.preventDefault();
+              $.ajax({
+                url: '/log/' + log_id,
+                type: 'PUT',
+                data: $('#log_form').serialize(),
+                success: function(data) {                
+                  $('#log_food_modal').modal('hide');
+                  //location.reload();
+                  
+                },
+              });
+            });
           }
+        });
+        });
+    });
+    
+    $('#delete_log').on('click', function(event) {
+      msg = ''
+      $('#select_row_msg').text('Select a row to delete');
+      table = $('#data').DataTable();
+      table.on( 'select', function ( e, dt, type, indexes ) {    
+        var log_id = table.rows( { selected: true } ).data()[0][0];
+        $.ajax({
+          url: '/log/' + log_id,
+          type: 'DELETE',
+          success: function(data) {                
+            //location.reload();  
+          },
         });
         });
     });
