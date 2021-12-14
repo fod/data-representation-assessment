@@ -83,7 +83,6 @@
   </div>
 </div>
 
-
 <!-- add food modal -->
 <div class="modal fade" id="add_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
   <div class="modal-dialog">
@@ -125,6 +124,25 @@
     </div>
   </div>
 </div>
+
+<!-- log food modal -->
+<div class="modal fade" id="delete_confirm_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="log_food_label" style="margin: 0 auto;">Confirm Delete</h5>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this log entry?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="cancel_del_btn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm_del_btn">Delete</button>
+    </div>
+    </div>
+  </div>
+</div>
+
 <span id="select_row_msg" class="text-dark fs-3"></span>
 <table id="data" class="table table-striped small rounded" style="text-shadow:none">
   <thead>
@@ -172,7 +190,8 @@
 <script>
   $(document).ready(function () {
 
-    
+    edit_mode = false;
+
     food_name = '{{ food_name }}';
     if (food_name != '') {
       $('#log_food_modal').modal('show');
@@ -243,21 +262,22 @@
 
     // Log food form submission
     $('#log_form').on('submit', function() {
-      event.preventDefault();
-      $.ajax({
-        url: '/food_log/add',
-        type: 'POST',
-        data: $('#log_form').serialize(),
-        success: function (data) {
-            console.log("success")
-            location.reload();
-            $('#log_food_modal').modal('hide');
-        }
-      });
-    })
+      event.preventDefault()
+      if (!edit_mode) {
+        $.ajax({
+          url: '/food_log/add',
+          type: 'POST',
+          data: $('#log_form').serialize(),
+          success: function (data) {
+            location.reload()
+          }
+        });
+      } 
+    });
 
     // Edit log entry
     $('#edit_log').on('click', function (event) {
+      edit_mode = true;
       msg = ''
       $('#select_row_msg').text('Select a row to edit');
       table = $('#data').DataTable();
@@ -277,39 +297,49 @@
             $('#quantity').val(data.quantity);
             $('#food_id_log').val(data.food_id);
             // update log entry form submission handler
+            if (edit_mode) {    
             $('#log_form').on('submit', function (event) {
-              event.preventDefault();
               $.ajax({
                 url: '/log/' + log_id,
                 type: 'PUT',
                 data: $('#log_form').serialize(),
                 success: function () {
                   $('#log_food_modal').modal('hide');
+                  edit_mode = false;
+                  location.reload();
                 },
               });
             });
+          }
           }
         });
       });
     });
 
-    // $('#delete_log').on('click', function (event) {
-    //   msg = ''
-    //   $('#select_row_msg').text('Select a row to delete');
-    //   table = $('#data').DataTable();
-    //   table.on('select', function (e, dt, type, indexes) {
-    //     var log_id = table.rows({ selected: true }).data()[0][0];
-    //     $.ajax({
-    //       url: '/log/' + log_id,
-    //       type: 'DELETE',
-    //       success: function (data) {
-    //         //location.reload();  
-    //       },
-    //     });
-    //   });
-    // });
-
-
+    $('#delete_log').on('click', function (event) {
+      msg = ''
+      $('#select_row_msg').text('Select a row to delete');
+      table = $('#data').DataTable();
+      table.on('select', function (e, dt, type, indexes) {
+        $('#delete_confirm_modal').modal('show');
+        $('#cancel_del_btn').on('click', function (event) {
+          $('#delete_confirm_modal').modal('hide');
+          window.location.href = window.location.href;
+        });
+        $('#confirm_del_btn').on('click', function (event) {
+          // Get selected row
+          var log_id = table.rows({ selected: true }).data()[0][0];
+          $.ajax({
+            url: '/log/' + log_id,
+            type: 'DELETE',
+            success: function (e) {
+              $('#delete_confirm_modal').modal('hide');
+              window.location.href = window.location.href;
+            }
+          });
+        });
+      });
+    });
   });
 
 

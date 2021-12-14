@@ -147,7 +147,7 @@ def autocomplete_add_details():
 
 
 # The main app
-@app.route('/food_log', methods=['GET', 'POST'])
+@app.route('/food_log', methods=['GET'])
 def food_log():
     # Only show this page if a user is logged in
     if session['loggedin']:
@@ -170,7 +170,7 @@ def food_log_add():
         foodDAO.log_food(user_id, food_id, quantity, date)
         # Return to food logging page
         food_log = foodDAO.get_log_by_userid(user_id)
-        return render_template('food_log.html', food_log=food_log)
+        return redirect(url_for('food_log'))
         
 # Retrieve a log entry by ID
 @app.route('/log/<int:log_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -185,6 +185,9 @@ def get_log_entry(log_id):
         date = request.form['date']
         quantity = request.form['quantity']
         foodDAO.update_log_entry(log_id, food_id, user_id, date, quantity)
+        return redirect(url_for('food_log'))
+    elif request.method == 'DELETE':
+        foodDAO.delete_log_entry(log_id)
         return redirect(url_for('food_log'))
 
 
