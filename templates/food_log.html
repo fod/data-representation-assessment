@@ -51,7 +51,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form id="log_form" class="log_add log_edit">
+        <form id="log_form">
           <div class="form-group wide mb-3">
             <label for="food">Food</label>
             <input type="text" required class="form-control" name="food" id="autocomplete_log" placeholder="Enter food name">
@@ -82,6 +82,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- add food modal -->
 <div class="modal fade" id="add_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
@@ -241,18 +242,16 @@
     });
 
     // Log food form submission
-    $('#log_form.log_add').on('submit', function() {
+    $('#log_form').on('submit', function() {
+      event.preventDefault();
       $.ajax({
         url: '/food_log/add',
         type: 'POST',
         data: $('#log_form').serialize(),
         success: function (data) {
-          if (data.success) {
+            console.log("success")
+            location.reload();
             $('#log_food_modal').modal('hide');
-            $('#data').DataTable().ajax.reload();
-          } else {
-            $('#log_food_error').html(data.msg);
-          }
         }
       });
     })
@@ -273,23 +272,19 @@
           success: function (data) {
             // Populate update log entry form with data
             $('#log_food_modal').modal('show');
-            $('#log_form').removeClass('log_add');
             $('#autocomplete_log').val(data.name);
             $('#date').val(data.date);
             $('#quantity').val(data.quantity);
             $('#food_id_log').val(data.food_id);
             // update log entry form submission handler
-            $('#log_form.log_edit').on('submit', function (event) {
+            $('#log_form').on('submit', function (event) {
               event.preventDefault();
               $.ajax({
                 url: '/log/' + log_id,
                 type: 'PUT',
                 data: $('#log_form').serialize(),
                 success: function () {
-                  $('#log_form').addClass('log_add');
                   $('#log_food_modal').modal('hide');
-                  //location.reload();
-
                 },
               });
             });
