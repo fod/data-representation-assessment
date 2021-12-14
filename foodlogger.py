@@ -185,9 +185,10 @@ def get_log_entry(log_id):
         date = request.form['date']
         quantity = request.form['quantity']
         foodDAO.update_log_entry(log_id, food_id, user_id, date, quantity)
-        return redirect(url_for('food_log'))
+        return {'id': user_id}
     elif request.method == 'DELETE':
         foodDAO.delete_log_entry(log_id)
-        return redirect(url_for('food_log'))
+        user_id = session['id']
+        return {}
 
 

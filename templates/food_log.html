@@ -272,19 +272,23 @@
             location.reload()
           }
         });
+      }
+      else {
+        console.log("EDIT_MODE")
       } 
     });
 
     // Edit log entry
     $('#edit_log').on('click', function (event) {
+      event.preventDefault()
       edit_mode = true;
-      msg = ''
       $('#select_row_msg').text('Select a row to edit');
       table = $('#data').DataTable();
       // Get selected row
       table.on('select', function (e, dt, type, indexes) {
         // Get log entry id from hidden column at start of row
         var log_id = table.rows({ selected: true }).data()[0][0];
+        // Get that log entry from the db
         $.ajax({
           url: '/log/' + log_id,
           type: 'GET',
@@ -297,8 +301,10 @@
             $('#quantity').val(data.quantity);
             $('#food_id_log').val(data.food_id);
             // update log entry form submission handler
-            if (edit_mode) {    
+            if (edit_mode) { 
             $('#log_form').on('submit', function (event) {
+              event.preventDefault()
+
               $.ajax({
                 url: '/log/' + log_id,
                 type: 'PUT',
@@ -317,7 +323,6 @@
     });
 
     $('#delete_log').on('click', function (event) {
-      msg = ''
       $('#select_row_msg').text('Select a row to delete');
       table = $('#data').DataTable();
       table.on('select', function (e, dt, type, indexes) {
@@ -334,7 +339,7 @@
             type: 'DELETE',
             success: function (e) {
               $('#delete_confirm_modal').modal('hide');
-              window.location.href = window.location.href;
+              location.reload();
             }
           });
         });
