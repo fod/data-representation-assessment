@@ -4,12 +4,12 @@
 
 {% block nav %}
 <a class="nav-link" href="login">Login</a>
-<a class="nav-link active" aria-current="page" href="register">Register</a>
+<a class="nav-link active" href="register">Register</a>
 {% endblock %}
 
 {% block content %}
 
-<form action="{{ url_for('register') }}" method="post">
+<form id="register_form">
   <div class="form-group mb-4">
     <h1>Register</h1>
   </div>
@@ -34,5 +34,32 @@
 <p><strong>{{ msg}}</strong>
   {% endif %}
 
+  {{ super() }}
+
   {% endblock %}
   <!-- end block content -->
+
+  {% block scripts %}
+
+  {{ super() }}
+
+  <script>
+
+    $(document).ready(function () {
+      $('#register_form').submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+          type: 'POST',
+          url: '{{ url_for("register") }}',
+          data: $('#register_form').serialize(),
+          success: function (data) {
+            window.location.href = '{{url_for("food_log")}}';
+          }
+        });
+      });
+    });
+
+  </script>
+
+  {% endblock %}
+  <!-- end block scripts -->

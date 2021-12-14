@@ -6,113 +6,125 @@
 
 {% block nav %}
 
-<a class="nav-link active" aria-current="page" href="#" data-toggle="tooltip" title="View your food logs" id="view_nav_link">View</a>
+<a class="nav-link active" href="#" data-toggle="tooltip" title="View your food logs"
+  id="view_nav_link">View</a>
 
-      <a class="nav-link dropdown-toggle pe-3" href="#" id="log" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Log
-      </a>
-      <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-        <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Log something you've eaten" data-bs-toggle="modal" data-bs-target="#log_food_modal">Log food item</a></li>
-        <li><a class="dropdown-item" id="edit_log" href="#" data-toggle="tooltip" title="Edit a log record">Edit record</a></li>
-        <li><a class="dropdown-item" id="delete_log" href="#" data-toggle="tooltip" title="Delete a log record">Delete record</a></li>
-      </ul>
- 
-      <a class="nav-link dropdown-toggle pe-3" href="#" id="foods" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Foods
-      </a>
-      <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-        <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Add a new food item to the database"  data-bs-toggle="modal" data-bs-target="#add_food_modal">Add new food</a></li>
-        <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Update a food item's details">Edit food</a></li>
-        <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Delete a food item from the database">Delete food</a></li>
-      </ul>
+<a class="nav-link dropdown-toggle pe-3" href="#" id="log" role="button" data-bs-toggle="dropdown">
+  Log
+</a>
+<ul class="dropdown-menu dropdown-menu-dark">
+  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Log something you've eaten" data-bs-toggle="modal"
+      data-bs-target="#log_food_modal">Log food item</a></li>
+  <li><a class="dropdown-item" id="edit_log" href="#" data-toggle="tooltip" title="Edit a log record">Edit record</a>
+  </li>
+  <li><a class="dropdown-item" id="delete_log" href="#" data-toggle="tooltip" title="Delete a log record">Delete
+      record</a></li>
+</ul>
 
-<a class="nav-link" href="logout" data-toggle="tooltip" title="Log out of the application">Logout {{session.username}}</a>
+<a class="nav-link dropdown-toggle pe-3" href="#" id="foods" role="button" data-bs-toggle="dropdown">
+  Foods
+</a>
+<ul class="dropdown-menu dropdown-menu-dark">
+  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Add a new food item to the database"
+      data-bs-toggle="modal" data-bs-target="#add_food_modal">Add new food</a></li>
+  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Update a food item's details">Edit food</a></li>
+  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Delete a food item from the database">Delete
+      food</a></li>
+</ul>
+
+<a class="nav-link" href="logout" data-toggle="tooltip" title="Log out of the application">Logout
+  {{session.username}}</a>
 
 {% endblock %}
+
 {% set bgcol = 'bg-light bg-opacity-90 border border-white' %}
+
+
 {% block content %}
 
-    <!-- log food modal -->
-    <div class="modal fade" id="log_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="log_food_label" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="log_food_label">Log a food item</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- log food modal -->
+<div class="modal fade" id="log_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="log_food_label">Log a food item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="log_form" class="log_add log_edit">
+          <div class="form-group wide mb-3">
+            <label for="food">Food</label>
+            <input type="text" required class="form-control" name="food" id="autocomplete_log" placeholder="Enter food name">
           </div>
-          <div class="modal-body">
-            <form action="{{ url_for('log_food') }}" method="post" id="log_form">
-              <div class="form-group wide mb-3">              
-                  <label for="food">Food</label>
-                  <input type="text" required class="form-control" name="food" id="autocomplete_log" aria-describedby="foodHelp" placeholder="Enter food name">                  
-                  <input type="hidden" name="food_id" id="food_id_log">    
-                </div>
-                <div class="form-group wide mb-3">  
-                  <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="If the food you're looking for isn't appearing in the list, click here to add a new food type to the database" data-bs-toggle="modal" data-bs-target="#add_food_modal" id="add_food_btn">Add new food to database</button> 
-                  </div>
-              <div class="form-group wide mb-3">
-                <label for="date">Date</label>
-                <input type="date" required class="form-control" name="date" id="date" aria-describedby="dateHelp" placeholder="Select date">
-              </div>
-              <div class="form-group wide mb-3">
-                <label for="quantity">Quantity (g)</label>
-                <input type="number" required class="form-control" name="quantity" id="quantity" placeholder="Quantity (g)">
-              </div>
+          <div class="form-group wide mb-3">
+            <button class="btn btn-secondary" type="button" data-toggle="tooltip"
+              title="If the food you're looking for isn't appearing in the list, click here to add a new food type to the database"
+              data-bs-toggle="modal" data-bs-target="#add_food_modal" id="add_food_btn">Add new food to
+              database</button>
+          </div>
+          <div class="form-group wide mb-3">
+            <label for="date">Date</label>
+            <input type="date" required class="form-control" name="date" id="date" placeholder="Select date">
+          </div>
+          <div class="form-group wide mb-3">
+            <label for="quantity">Quantity (g)</label>
+            <input type="number" required class="form-control" name="quantity" id="quantity" placeholder="Quantity (g)">
+          </div>
 
-              <div class="form-group wide mb-3">
-                  <button type="submit" class="btn btn-secondary" id="log_food_submit">Submit</button>
-                  <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                </div>
-              
-            </form>
-            <span id="log_food_error" class="text-danger"></span>
+          <div class="form-group wide mb-3">
+            <button type="submit" class="btn btn-secondary" id="log_food_submit">Submit</button>
+            <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           </div>
-        </div>
+
+        </form>
+        <span id="log_food_error" class="text-danger"></span>
       </div>
     </div>
+  </div>
+</div>
 
-        <!-- add food modal -->
-        <div class="modal fade" id="add_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="add_food_label" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="add_food_label">Add a food type</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form action="{{ url_for('add_food') }}" method="post">
-                  <div class="form-group wide mb-3">
-                      <label for="food">Food</label>
-                      <input type="text" required class="form-control" name="food" id="autocomplete_add" aria-describedby="foodHelp" placeholder="Enter food name">
-                    </div>
-                  <div class="form-group wide mb-3">
-                    <label for="calories">Calories / 100g</label>
-                    <input type="number" required class="form-control" name="calories" id="calories" aria-describedby="caloriesHelp" placeholder="Calories per 100g">
-                  </div>
-                  <div class="form-group wide mb-3">
-                    <label for="protein">Protein %</label>
-                    <input type="number" step="0.01" required class="form-control" name="protein" id="protein" aria-describedby="proteinHelp" placeholder="Protein (g per 100g)">
-                  </div>
-                  <div class="form-group wide mb-3">
-                    <label for="carbs">Carbohydrate %</label>
-                    <input type="number" step="0.01" required class="form-control" name="carbs" id="carbs" aria-describedby="carbsHelp" placeholder="Carbohydrate (g per 100g)">
-                  </div>
-                  <div class="form-group wide mb-3">
-                    <label for="fat">Fat %</label>
-                    <input type="number" step="0.01" required class="form-control" name="fat" id="fat" aria-describedby="fatHelp" placeholder="Fat (g per 100g)">
-                  </div>
-    
-                  <div class="form-group wide mb-3">
-                      <button type="submit" class="btn btn-secondary">Submit</button>
-                      <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                  
-                </form>
-              </div>
-            </div>
+<!-- add food modal -->
+<div class="modal fade" id="add_food_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_food_label">Add a food type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="add_food_form">
+          <div class="form-group wide mb-3">
+            <label for="food">Food</label>
+            <input type="text" required class="form-control" name="food" id="autocomplete_add" placeholder="Enter food name">
           </div>
-        </div>
-<span id="select_row_msg" class="text-danger fs-3"></span>
+          <div class="form-group wide mb-3">
+            <label for="calories">Calories / 100g</label>
+            <input type="number" required class="form-control" name="calories" id="calories" placeholder="Calories per 100g">
+          </div>
+          <div class="form-group wide mb-3">
+            <label for="protein">Protein %</label>
+            <input type="number" step="0.01" required class="form-control" name="protein" id="protein" placeholder="Protein (g per 100g)">
+          </div>
+          <div class="form-group wide mb-3">
+            <label for="carbs">Carbohydrate %</label>
+            <input type="number" step="0.01" required class="form-control" name="carbs" id="carbs" placeholder="Carbohydrate (g per 100g)">
+          </div>
+          <div class="form-group wide mb-3">
+            <label for="fat">Fat %</label>
+            <input type="number" step="0.01" required class="form-control" name="fat" id="fat" placeholder="Fat (g per 100g)">
+          </div>
+
+          <div class="form-group wide mb-3">
+            <button type="submit" class="btn btn-secondary">Submit</button>
+            <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<span id="select_row_msg" class="text-dark fs-3"></span>
 <table id="data" class="table table-striped small rounded" style="text-shadow:none">
   <thead>
     <tr>
@@ -127,7 +139,9 @@
     </tr>
   </thead>
   <tbody>
+
     {% for log in food_log %}
+    
     <tr>
       <td style="display:none;">{{ log.id }}</td>
       <td>{{ log.date }}</td>
@@ -141,20 +155,23 @@
     {% endfor %}
   </tbody>
 </table>
+
+
 {% endblock %}
-$(document).on('click', "#button2", function() {
-  $('#changeProfileModal').modal('show');
-});
+
 {% block footer %}
 
 {% endblock %}
 
 {% block scripts %}
+
 {{ super() }}
+
 <script src="{{ url_for('static', filename='jquery.autocomplete.js') }}"></script>
 <script>
   $(document).ready(function () {
 
+    
     food_name = '{{ food_name }}';
     if (food_name != '') {
       $('#log_food_modal').modal('show');
@@ -167,6 +184,7 @@ $(document).on('click', "#button2", function() {
       $('#log_food_error').html(bad_log_msg);
     }
 
+    // Render log data table as a DataTables table
     $('#data').DataTable({
       'searching': false,
       'lengthChange': false,
@@ -174,78 +192,35 @@ $(document).on('click', "#button2", function() {
       'order': [[0, 'desc']],
     });
 
-    $('[data-toggle="tooltip"]').tooltip({'placement':'left', 'trigger': 'hover'});
+    // Bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip({ 'placement': 'left', 'trigger': 'hover' });
 
-    $('.nav-link').on('click', function(event) {
+    // Highlight the active nav-bar link
+    $('.nav-link').on('click', function (event) {
       $('.nav-link.active').removeClass('active');
       $(this).addClass('active');
     });
 
-    $('#edit_log').on('click', function(event) {
-      msg = ''
-      $('#select_row_msg').text('Select a row to edit');
-      table = $('#data').DataTable();
-      table.on( 'select', function ( e, dt, type, indexes ) {       
-        var log_id = table.rows( { selected: true } ).data()[0][0];
-        $.ajax({
-          url: '/log/' + log_id,
-          type: 'GET',
-          dataType: "JSON",
-          success: function(data) {
-            $('#log_food_modal').modal('show');
-            $('#autocomplete_log').val(data.name);
-            $('#date').val(data.date);
-            $('#quantity').val(data.quantity);
-            $('#food_id_log').val(data.food_id);
-            //$('#log_form').removeAttr('action');//(, '/log/' + log_id).attr('method', 'PUT');
-            $('#log_form').on('submit', function(event) {
-              event.preventDefault();
-              $.ajax({
-                url: '/log/' + log_id,
-                type: 'PUT',
-                data: $('#log_form').serialize(),
-                success: function(data) {                
-                  $('#log_food_modal').modal('hide');
-                  //location.reload();
-                  
-                },
-              });
-            });
-          }
-        });
-        });
-    });
-    
-    $('#delete_log').on('click', function(event) {
-      msg = ''
-      $('#select_row_msg').text('Select a row to delete');
-      table = $('#data').DataTable();
-      table.on( 'select', function ( e, dt, type, indexes ) {    
-        var log_id = table.rows( { selected: true } ).data()[0][0];
-        $.ajax({
-          url: '/log/' + log_id,
-          type: 'DELETE',
-          success: function(data) {                
-            //location.reload();  
-          },
-        });
-        });
-    });
-
-    $('#log_food_modal,#add_food_modal').on('hidden.bs.modal', function() {
+    // Highlight correct nav-barl links when modals are closed
+    $('#log_food_modal,#add_food_modal').on('hidden.bs.modal', function () {
       $('.nav-link.active').removeClass('active');
       $('#view_nav_link').addClass('active');
     });
 
+    // Autocomplete for log food modal
+    // Uses local db
     $('#autocomplete_log').autocomplete({
       serviceUrl: '/autocomplete_log/food',
       onSearchComplete: function (query, suggestions) {
-        if(!suggestions.length){
+        if (!suggestions.length) {
+          // When local suggestions are exhausted highlight the add food button
           $('#add_food_btn').addClass('btn-warning');
         }
       }
-  });
+    });
 
+    // Autocomplete for add food modal
+    // Uses external (edamam) api
     $('#autocomplete_add').autocomplete({
       serviceUrl: '/autocomplete_add/food',
       onSelect: function (suggestion) {
@@ -253,8 +228,8 @@ $(document).on('click', "#button2", function() {
           url: '/autocomplete_add_details',
           type: 'GET',
           "dataType": "JSON",
-          data: {'query': encodeURIComponent(suggestion.value)},
-          success: function(data) {
+          data: { 'query': encodeURIComponent(suggestion.value) },
+          success: function (data) {
             $('#autocomplete_add').val(data.name);
             $('#calories').val(data.calories);
             $('#protein').val(data.protein);
@@ -262,15 +237,87 @@ $(document).on('click', "#button2", function() {
             $('#fat').val(data.fat);
           }
         });
-    }
+      }
+    });
+
+    // Log food form submission
+    $('#log_form.log_add').on('submit', function() {
+      $.ajax({
+        url: '/food_log/add',
+        type: 'POST',
+        data: $('#log_form').serialize(),
+        success: function (data) {
+          if (data.success) {
+            $('#log_food_modal').modal('hide');
+            $('#data').DataTable().ajax.reload();
+          } else {
+            $('#log_food_error').html(data.msg);
+          }
+        }
+      });
+    })
+
+    // Edit log entry
+    $('#edit_log').on('click', function (event) {
+      msg = ''
+      $('#select_row_msg').text('Select a row to edit');
+      table = $('#data').DataTable();
+      // Get selected row
+      table.on('select', function (e, dt, type, indexes) {
+        // Get log entry id from hidden column at start of row
+        var log_id = table.rows({ selected: true }).data()[0][0];
+        $.ajax({
+          url: '/log/' + log_id,
+          type: 'GET',
+          dataType: 'JSON',
+          success: function (data) {
+            // Populate update log entry form with data
+            $('#log_food_modal').modal('show');
+            $('#log_form').removeClass('log_add');
+            $('#autocomplete_log').val(data.name);
+            $('#date').val(data.date);
+            $('#quantity').val(data.quantity);
+            $('#food_id_log').val(data.food_id);
+            // update log entry form submission handler
+            $('#log_form.log_edit').on('submit', function (event) {
+              event.preventDefault();
+              $.ajax({
+                url: '/log/' + log_id,
+                type: 'PUT',
+                data: $('#log_form').serialize(),
+                success: function () {
+                  $('#log_form').addClass('log_add');
+                  $('#log_food_modal').modal('hide');
+                  //location.reload();
+
+                },
+              });
+            });
+          }
+        });
+      });
+    });
+
+    // $('#delete_log').on('click', function (event) {
+    //   msg = ''
+    //   $('#select_row_msg').text('Select a row to delete');
+    //   table = $('#data').DataTable();
+    //   table.on('select', function (e, dt, type, indexes) {
+    //     var log_id = table.rows({ selected: true }).data()[0][0];
+    //     $.ajax({
+    //       url: '/log/' + log_id,
+    //       type: 'DELETE',
+    //       success: function (data) {
+    //         //location.reload();  
+    //       },
+    //     });
+    //   });
+    // });
+
+
   });
-
-
- 
-});
 
 
 
 </script>
 {% endblock %}
-

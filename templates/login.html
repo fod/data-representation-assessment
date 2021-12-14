@@ -3,36 +3,53 @@
 {% block title %}Login{% endblock %}
 
 {% block nav %}
-<a class="nav-link active" aria-current="page" href="login">Login</a>
+<a class="nav-link active" href="login">Login</a>
 <a class="nav-link" href="register">Register</a>
 {% endblock %}
 
 {% block content %}
 
-<form action="/login" method="post">
+<form id="login_form">
     <div class="form-group mb-4">
         <h1>Login</h1>
-        </div>
-    <div class="form-group mb-3">
-        <label for="username">User Name</label>
-        <input type="text" class="form-control" name="username" id="username" aria-describedby="usernameHelp"
-            placeholder="Enter username" >
-        </div>
-    <div class="form-group mb-3">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" name="password" id="password" placeholder="Password" >
     </div>
     <div class="form-group mb-3">
-        <button type="submit" class="btn btn-lg btn-secondary" >Submit</button>
+        <label for="username">User Name</label>
+        <input type="text" class="form-control" name="username" id="username" placeholder="Enter username">
+    </div>
+    <div class="form-group mb-3">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+    </div>
+    <div class="form-group mb-3">
+        <button type="submit" class="btn btn-lg btn-secondary">Submit</button>
     </div>
 </form>
 
-{% if msg %}
-<p class="error"><strong>{{ msg }}</strong> 
-{% endif %}
+{{ super() }}
 
-{% endblock %}   <!-- end block content -->
+{% endblock %}
+<!-- end block content -->
+
+{% block scripts %}
+{{ super() }}
 
 <script>
 
+    $(document).ready(function () {
+        $('#login_form').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "login",
+                data: $('#login_form').serialize(),
+                success: function (data) {
+                    window.location.href = '{{url_for("food_log")}}';
+                }
+            });
+        });
+
+    });
 </script>
+{% endblock %}
+<!-- end block scripts -->
