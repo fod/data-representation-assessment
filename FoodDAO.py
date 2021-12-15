@@ -210,3 +210,33 @@ class FoodDAO:
             return result[0][0]
         else:
             return None
+
+    # Add a new food item
+    def add_food_item(self, name, calories, protein, carbs, fat):
+        db = self.get_connection()
+        cursor = db.cursor()
+        sql="INSERT INTO food_items (name, calories, protein, carbs, fat) VALUES (%s, %s, %s, %s, %s)"
+        values = (name, calories, protein, carbs, fat)
+        cursor.execute(sql, values)
+        db.commit()
+        lastRowId = cursor.lastrowid
+        db.close()
+        return lastRowId
+
+    # Delete a food item by id
+    def delete_food_item(self, food_id):
+        db = self.get_connection()
+        cursor = db.cursor()
+        sql="DELETE FROM food_items WHERE id = %s"
+        values = (food_id,)
+        try:
+            cursor.execute(sql, values)
+            db.commit()
+            db.close()
+            return True
+        except db.IntegrityError as integrity_error:
+            db.close()
+            return False
+        cursor.execute(sql, values)
+        db.commit()
+        db.close()

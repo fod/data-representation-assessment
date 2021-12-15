@@ -29,7 +29,7 @@ foodDAO = FoodDAO()
 ### User Management ###
 
 # Logging in and out
-
+# Session management
 def session_login(username, password):
     account = foodDAO.get_user_by_name(username, password)
     if account:
@@ -43,24 +43,24 @@ def session_login(username, password):
         session['id'] = None
         return False
 
-
+# Login
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    if request.method == 'POST' and 'username' in request.form \
+                                and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
         if session_login(username, password):
             msg = 'Logged in successfully!'
-            #food_log = foodDAO.get_log_by_username(session['username'])
-            #return render_template('food_log.html', food_log=food_log, msg=msg)
             return redirect(url_for('food_log'))
         else:
             msg = 'Incorrect username / password'
             return render_template('login.html', msg = msg)
     return render_template('login.html', msg = msg)        
 
+# Logout
 @app.route('/logout')
 def logout():
     session.pop('loggedin', None)
@@ -85,6 +85,7 @@ def register():
         # Check if username or email are already taken
         account = foodDAO.get_user_by_name(username)
         account_email = foodDAO.get_user_by_email(email)
+        # Validate details 
         if account:
             msg = 'Account already exists'
         elif account_email:
@@ -125,7 +126,9 @@ def autocomplete_log():
 @app.route('/autocomplete_add/food', methods=['GET', 'POST'])
 def autocomplete_add():
     query = request.args.get('query')
-    api_url = EDAMAM_AUTOCOMPLETE_BASE_URL + '?app_id=' + EDAMAM_APP_ID + '&app_key=' + EDAMAM_API_KEY + '&q=' + query + '&limit=20'
+    api_url = EDAMAM_AUTOCOMPLETE_BASE_URL + '?app_id=' + EDAMAM_APP_ID \
+                                           + '&app_key=' + EDAMAM_API_KEY \
+                                           + '&q=' + query + '&limit=20'
     results = requests.get(api_url).json()
     returnDict = {'query': query, 'suggestions': results}
     return returnDict
@@ -135,14 +138,20 @@ def autocomplete_add():
 @app.route('/autocomplete_add_details/', methods=['GET', 'POST'])
 def autocomplete_add_details():
     query = request.args.get('query')
-    api_url = EDAMAM_PARSER_BASE_URL + '?app_id=' + EDAMAM_APP_ID + '&app_key=' + EDAMAM_API_KEY + '&ingr=' + query + '&nutrition-type=logging'         
+    api_url = EDAMAM_PARSER_BASE_URL + '?app_id=' + EDAMAM_APP_ID + '&app_key=' \
+                                     + EDAMAM_API_KEY + '&ingr=' + query \
+                                     + '&nutrition-type=logging'         
     results = requests.get(api_url).json()
     details = results['parsed'][0]['food']
     returnDict = {'name':    details['label'] if 'label' in details else query, 
-                  'calories': round(details['nutrients']['ENERC_KCAL']) if 'ENERC_KCAL' in details['nutrients'] else 0,
-                  'protein':  round(details['nutrients']['PROCNT'], 2) if 'PROCNT' in details['nutrients'] else 0,
-                  'fat':      round(details['nutrients']['FAT'], 2) if 'FAT' in details['nutrients'] else 0,
-                  'carbs':    round(details['nutrients']['CHOCDF'], 2) if 'CHOCDF' in details['nutrients'] else 0}
+                  'calories': round(details['nutrients']['ENERC_KCAL']) 
+                                if 'ENERC_KCAL' in details['nutrients'] else 0,
+                  'protein':  round(details['nutrients']['PROCNT'], 2) 
+                                if 'PROCNT' in details['nutrients'] else 0,
+                  'fat':      round(details['nutrients']['FAT'], 2) 
+                                if 'FAT' in details['nutrients'] else 0,
+                  'carbs':    round(details['nutrients']['CHOCDF'], 2) 
+                                if 'CHOCDF' in details['nutrients'] else 0}
     return returnDict
 
 
@@ -191,4 +200,32 @@ def get_log_entry(log_id):
         user_id = session['id']
         return {}
 
+# Add a new food to the database
+@app.route('/food/add', methods=['GET', 'POST'])
+def food_add():
+    if request.method == 'POST':
+        print("POST")
+        name = request.form['food']
+        calories = request.form['calories']
+        protein = request.form['protein']
+        carbs = request.form['carbs']
+        fat = request.form['fat']
+        foodDAO.add_food_item(name, calories, protein, carbs, fat)
+        return {'id': foodDAO.get_food_id(name)}
+
+
+# Delete or update a food item by id
+@app.route('/food/del/<int:food_id>', methods=['DELETE', 'PUT'])
+def food_delete(food_id):
+    if request.method == 'DELETE':
+        foodDAO.delete_food(food_id)
+        return {}
+    elif request.method == 'PUT':
+        food = request.form['food']
+        calories = request.form['calories']
+        protein = request.form['protein']
+        carbs = request.form['carbs']
+        fat = request.form['fat']
+        foodDAO.update_food(food_id, food, calories, protein, carbs, fat)
+        return {}
 

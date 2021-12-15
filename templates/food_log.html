@@ -6,8 +6,7 @@
 
 {% block nav %}
 
-<a class="nav-link active" href="#" data-toggle="tooltip" title="View your food logs"
-  id="view_nav_link">View</a>
+<a class="nav-link active" href="#" data-toggle="tooltip" title="View your food logs" id="view_nav_link">View</a>
 
 <a class="nav-link dropdown-toggle pe-3" href="#" id="log" role="button" data-bs-toggle="dropdown">
   Log
@@ -54,7 +53,8 @@
         <form id="log_form">
           <div class="form-group wide mb-3">
             <label for="food">Food</label>
-            <input type="text" required class="form-control" name="food" id="autocomplete_log" placeholder="Enter food name">
+            <input type="text" required class="form-control" name="food" id="autocomplete_log"
+              placeholder="Enter food name">
           </div>
           <div class="form-group wide mb-3">
             <button class="btn btn-secondary" type="button" data-toggle="tooltip"
@@ -95,23 +95,28 @@
         <form id="add_food_form">
           <div class="form-group wide mb-3">
             <label for="food">Food</label>
-            <input type="text" required class="form-control" name="food" id="autocomplete_add" placeholder="Enter food name">
+            <input type="text" required class="form-control" name="food" id="autocomplete_add"
+              placeholder="Enter food name">
           </div>
           <div class="form-group wide mb-3">
             <label for="calories">Calories / 100g</label>
-            <input type="number" required class="form-control" name="calories" id="calories" placeholder="Calories per 100g">
+            <input type="number" required class="form-control" name="calories" id="calories"
+              placeholder="Calories per 100g">
           </div>
           <div class="form-group wide mb-3">
             <label for="protein">Protein %</label>
-            <input type="number" step="0.01" required class="form-control" name="protein" id="protein" placeholder="Protein (g per 100g)">
+            <input type="number" step="0.01" required class="form-control" name="protein" id="protein"
+              placeholder="Protein (g per 100g)">
           </div>
           <div class="form-group wide mb-3">
             <label for="carbs">Carbohydrate %</label>
-            <input type="number" step="0.01" required class="form-control" name="carbs" id="carbs" placeholder="Carbohydrate (g per 100g)">
+            <input type="number" step="0.01" required class="form-control" name="carbs" id="carbs"
+              placeholder="Carbohydrate (g per 100g)">
           </div>
           <div class="form-group wide mb-3">
             <label for="fat">Fat %</label>
-            <input type="number" step="0.01" required class="form-control" name="fat" id="fat" placeholder="Fat (g per 100g)">
+            <input type="number" step="0.01" required class="form-control" name="fat" id="fat"
+              placeholder="Fat (g per 100g)">
           </div>
 
           <div class="form-group wide mb-3">
@@ -138,7 +143,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-success" id="cancel_del_btn">Cancel</button>
         <button type="button" class="btn btn-danger" id="confirm_del_btn">Delete</button>
-    </div>
+      </div>
     </div>
   </div>
 </div>
@@ -160,7 +165,7 @@
   <tbody>
 
     {% for log in food_log %}
-    
+
     <tr>
       <td style="display:none;">{{ log.id }}</td>
       <td>{{ log.date }}</td>
@@ -261,7 +266,7 @@
     });
 
     // Log food form submission
-    $('#log_form').on('submit', function() {
+    $('#log_form').on('submit', function () {
       event.preventDefault()
       if (!edit_mode) {
         $.ajax({
@@ -275,7 +280,7 @@
       }
       else {
         console.log("EDIT_MODE")
-      } 
+      }
     });
 
     // Edit log entry
@@ -301,24 +306,38 @@
             $('#quantity').val(data.quantity);
             $('#food_id_log').val(data.food_id);
             // update log entry form submission handler
-            if (edit_mode) { 
-            $('#log_form').on('submit', function (event) {
-              event.preventDefault()
+            if (edit_mode) {
+              $('#log_form').on('submit', function (event) {
+                event.preventDefault()
 
-              $.ajax({
-                url: '/log/' + log_id,
-                type: 'PUT',
-                data: $('#log_form').serialize(),
-                success: function () {
-                  $('#log_food_modal').modal('hide');
-                  edit_mode = false;
-                  location.reload();
-                },
+                $.ajax({
+                  url: '/log/' + log_id,
+                  type: 'PUT',
+                  data: $('#log_form').serialize(),
+                  success: function () {
+                    $('#log_food_modal').modal('hide');
+                    edit_mode = false;
+                    location.reload();
+                  },
+                });
               });
-            });
-          }
+            }
           }
         });
+      });
+    });
+
+    // Add food form submission
+    $('#add_food_form').on('submit', function (event) {
+      event.preventDefault()
+      $.ajax({
+        url: '/food/add',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function (data) {
+          console.log("success")
+          $('#add_food_modal').modal('hide');
+        }
       });
     });
 
