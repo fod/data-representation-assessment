@@ -19,18 +19,7 @@
   <li><a class="dropdown-item" id="delete_log" href="#" data-toggle="tooltip" title="Delete a log record">Delete
       record</a></li>
 </ul>
-
-<a class="nav-link dropdown-toggle pe-3" href="#" id="foods" role="button" data-bs-toggle="dropdown">
-  Foods
-</a>
-<ul class="dropdown-menu dropdown-menu-dark">
-  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Add a new food item to the database"
-      data-bs-toggle="modal" data-bs-target="#add_food_modal">Add new food</a></li>
-  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Update a food item's details">Edit food</a></li>
-  <li><a class="dropdown-item" href="#" data-toggle="tooltip" title="Delete a food item from the database">Delete
-      food</a></li>
-</ul>
-
+<a class="nav-link" href="#" data-toggle="tooltip" title="Add a new food item to the database" data-bs-toggle="modal" data-bs-target="#add_food_modal">Add food</a>
 <a class="nav-link" href="logout" data-toggle="tooltip" title="Log out of the application">Logout
   {{session.username}}</a>
 
@@ -93,6 +82,7 @@
       </div>
       <div class="modal-body">
         <form id="add_food_form">
+          <div id="add_food_error" class="text-danger"></div>
           <div class="form-group wide mb-3">
             <label for="food">Food</label>
             <input type="text" required class="form-control" name="food" id="autocomplete_add"
@@ -120,8 +110,8 @@
           </div>
 
           <div class="form-group wide mb-3">
-            <button type="submit" class="btn btn-secondary">Submit</button>
-            <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" id="add-food-submit-btn" class="btn btn-secondary">Submit</button>
+            <button type="button" class="btn btn-secondary" id="add-food-cancel-btn" data-bs-dismiss="modal">Cancel</button>
           </div>
 
         </form>
@@ -196,6 +186,7 @@
   $(document).ready(function () {
 
     edit_mode = false;
+    back_to_log = false;
 
     food_name = '{{ food_name }}';
     if (food_name != '') {
@@ -260,6 +251,15 @@
             $('#protein').val(data.protein);
             $('#carbs').val(data.carbs);
             $('#fat').val(data.fat);
+          },
+          // Edamam autocomplete sometimes returns an error
+          // on certain foods so just keep the name and autofill zeroes for attributes
+          error: function (data) {
+            $('#autocomplete_add').val(suggestion.value);
+            $('#calories').val(0);
+            $('#protein').val(0);
+            $('#carbs').val(0);
+            $('#fat').val(0);
           }
         });
       }
@@ -328,19 +328,55 @@
     });
 
     // Add food form submission
-    $('#add_food_form').on('submit', function (event) {
+    $('#add-food-submit-btn').on('click', function (event) {
       event.preventDefault()
       $.ajax({
         url: '/food/add',
         type: 'POST',
-        data: $(this).serialize(),
+        data: $('#add_food_form').serialize(),
         success: function (data) {
-          console.log("success")
+          // Duplicate food entry error
+          if (data.id == -1) {
+            $('#add_food_error').html(data.integrity_error + " already exists in the database");
+          }
+          else {
+          if (back_to_log) {
+            $('#log_food_modal').modal('show');
+            $('#autocomplete_log').val($('#autocomplete_add').val()).focus();
+            back_to_log = false;
+          }
+          $('#add_food_form')[0].reset();
           $('#add_food_modal').modal('hide');
+          }
         }
       });
     });
 
+    // Clear add food form on cancel
+    $('#add-food-cancel-btn').on('click', function (event) {
+      event.preventDefault()
+      if (back_to_log) {
+        $('#log_food_modal').modal('show');
+        $('#autocomplete_log').val($('#autocomplete_add').val()).focus();
+        back_to_log = false;
+      }
+      $('#add_food_form')[0].reset();
+    });
+
+    // Set back_to_log flag when add food modal is opened from log food modal
+    $('#add_food_btn').on('click', function (event) {
+      back_to_log = true;
+    });
+
+    // If the add food button on the log food modal is clicked
+    // place the partial query in the log food form into the add food form
+    $('#add_food_modal').on('shown.bs.modal', function () {
+        if (back_to_log) {
+          $('#autocomplete_add').val($('#autocomplete_log').val()).focus();
+      }
+    });
+
+    // Delete log entry
     $('#delete_log').on('click', function (event) {
       $('#select_row_msg').text('Select a row to delete');
       table = $('#data').DataTable();

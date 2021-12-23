@@ -57,8 +57,8 @@ def login():
             return redirect(url_for('food_log'))
         else:
             msg = 'Incorrect username / password'
-            return render_template('login.html', msg = msg)
-    return render_template('login.html', msg = msg)        
+            return render_template('login.html', msg=msg)
+    return render_template('login.html', msg =msg)        
 
 # Logout
 @app.route('/logout')
@@ -210,8 +210,11 @@ def food_add():
         protein = request.form['protein']
         carbs = request.form['carbs']
         fat = request.form['fat']
-        foodDAO.add_food_item(name, calories, protein, carbs, fat)
-        return {'id': foodDAO.get_food_id(name)}
+        res = foodDAO.add_food_item(name, calories, protein, carbs, fat)
+        if res:
+            return {'id': foodDAO.get_food_id(name)}
+        else:
+            return {'id': -1, 'integrity_error': name}
 
 
 # Delete or update a food item by id
