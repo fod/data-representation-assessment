@@ -45,7 +45,13 @@
                 url: "login",
                 data: $('#login_form').serialize(),
                 success: function (data) {
-                    window.location.href = '{{url_for("food_log")}}';
+                    if(data.includes("Foodlogger - Login")) {
+                        $('#login_error').html("<p class='error text-danger'><strong>Username or password incorrect!</strong></p>");
+                    }
+                    else {
+                        window.location.href = '{{url_for("food_log")}}';
+                    }
+                    
                 }
             });
         });
