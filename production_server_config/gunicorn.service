@@ -1,0 +1,19 @@
+#/etc/systemd/system/gunicorn.service
+# Gunicorn foodlogger app systemd service file
+
+[Service]
+Type=notify
+# the specific user that our service will run as
+User=fod
+Group=fod
+RuntimeDirectory=gunicorn
+WorkingDirectory=/usr/share/html
+ExecStart=/usr/bin/gunicorn -w 3 foodlogger:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+

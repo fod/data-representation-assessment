@@ -1,5 +1,5 @@
-settings.py
-start.sh
+settings.real.py
+# start.sh
 .vscode/
 
 # Byte-compiled / optimized / DLL files

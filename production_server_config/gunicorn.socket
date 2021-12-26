@@ -1,0 +1,14 @@
+# /etc/systemd/gunicorn.socket
+# Gunicorn socket systemd unit file
+
+[Unit]
+Description=gunicorn socket
+
+[Socket]
+ListenStream=/run/gunicorn.sock
+# Default nginx user on arch
+SocketUser=http 
+
+[Install]
+WantedBy=sockets.target
+
