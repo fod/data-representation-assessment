@@ -4,6 +4,7 @@ server {
         server_name data-representation-project.eu;
 
         location / {
+                # Launch gunicorn when / is requested
                 proxy_pass http://unix:/run/gunicorn.sock;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -13,6 +14,7 @@ server {
                 alias /usr/share/html/static/;
         }
 
+    # ssl cert management for data-representation-project.eu
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/data-representation-project.eu/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/data-representation-project.eu/privkey.pem; # managed by Certbot
@@ -22,6 +24,7 @@ server {
 }
 
 server {
+    # Redirect http requests to https
     if ($host = data-representation-project.eu) {
         return 301 https://$host$request_uri;
     } # managed by Certbot

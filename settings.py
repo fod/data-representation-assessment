@@ -1,6 +1,7 @@
 # settings.py
 # Food app settings file
 # Author: Fiachra O' Donoghue
+# https://gist.github.com/fod/7437a5931192c295d37dd532d8b01176
 
 EDAMAM_AUTOCOMPLETE_BASE_URL =  "https://api.edamam.com/auto-complete"
 EDAMAM_PARSER_BASE_URL = "https://api.edamam.com/api/food-database/v2/parser"
